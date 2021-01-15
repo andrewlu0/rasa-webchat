@@ -4,15 +4,19 @@ import { connect } from 'react-redux';
 import TextareaAutosize from 'react-textarea-autosize';
 import Send from 'assets/send_button';
 import './style.scss';
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
 
 const Sender = ({ sendMessage, inputTextFieldHint, disabledInput, userInput }) => {
   const [inputValue, setInputValue] = useState('');
   const formRef = useRef('');
+  const { transcript, resetTranscript } = useSpeechRecognition()
+
   function handleChange(e) {
     setInputValue(e.target.value);
   }
 
   function handleSubmit(e) {
+    console.log(this.transcript);
     sendMessage(e);
     setInputValue('');
   }
@@ -29,9 +33,10 @@ const Sender = ({ sendMessage, inputTextFieldHint, disabledInput, userInput }) =
   return (
     userInput === 'hide' ? <div /> : (
       <form ref={formRef} className="rw-sender" onSubmit={handleSubmit}>
-
+        <button onClick={SpeechRecognition.startListening}>Start</button>
+        <button onClick={resetTranscript}>Reset</button>
         <TextareaAutosize type="text" minRows={1} onKeyDown={onEnterPress} maxRows={3} onChange={handleChange} className="rw-new-message" name="message" placeholder={inputTextFieldHint} disabled={disabledInput || userInput === 'disable'} autoFocus autoComplete="off" />
-        <button type="submit" className="rw-send" disabled={!(inputValue && inputValue.length > 0)}>
+        <button type="submit" className="rw-send" onClick={resetTranscript} disabled={!(inputValue && inputValue.length > 0)}>
           <Send className="rw-send-icon" ready={!!(inputValue && inputValue.length > 0)} alt="send" />
         </button>
       </form>));
